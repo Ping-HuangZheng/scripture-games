@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<title>經文背誦遊戲｜以賽亞書 1:18</title>
+<style>
+:root{--bg:#f6f3ec;--card:#fff;--ink:#1f2a37;--muted:#5b6675;--pri:#b3261e;--pri2:#8c1d17;--ok:#1e7a3c;--okbg:#e3f4e8;--bad:#b3261e;--badbg:#fde8e6;--line:#e3ddd0;--snow:#eef3f8}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans CJK TC","Noto Sans TC",sans-serif;font-size:18px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+header{text-align:center;margin:6px 0 14px}
+header h1{font-size:1.5rem;margin:0;color:var(--pri2)}
+header .ref{color:var(--muted);font-size:1rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:14px}
+h2{font-size:1.25rem;margin:0 0 6px}
+.hint{color:var(--muted);font-size:1rem;margin:0 0 12px}
+.btn{appearance:none;border:2px solid var(--pri);background:var(--pri);color:#fff;font:inherit;font-weight:700;border-radius:12px;min-height:52px;padding:10px 18px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:#fff;color:var(--pri)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.levels{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.levels{grid-template-columns:1fr 1fr}}
+.lv{display:flex;align-items:center;gap:12px;text-align:left;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:14px;min-height:72px;padding:10px 14px;font:inherit;cursor:pointer}
+.lv .n{flex:0 0 44px;height:44px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem}
+.lv small{display:block;color:var(--muted);font-size:.9rem}
+.lv.locked{opacity:.5;cursor:not-allowed}
+.lv.locked .n{background:#9aa3ad}
+.lv.done .n{background:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:60px}
+.chip{border:2px solid var(--line);background:var(--snow);color:var(--ink);font:inherit;font-size:1.15rem;font-weight:700;border-radius:12px;min-height:56px;padding:8px 14px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.chip.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.chip.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad);animation:shake .35s}
+.chip.used{visibility:hidden}
+.zone{border:2px dashed #c9bfa8;border-radius:14px;padding:12px;min-height:76px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;background:#fffdf8}
+.zone.over{background:#fff4e0}
+.zone .placed{background:var(--okbg);border:2px solid var(--ok);color:var(--ok);border-radius:10px;padding:6px 10px;font-weight:700;font-size:1.1rem}
+.verse{font-size:1.3rem;line-height:2.1;letter-spacing:.04em}
+.blank{display:inline-block;min-width:3.2em;border-bottom:3px solid #9aa3ad;color:transparent;margin:0 2px;padding:0 4px;border-radius:4px}
+.blank.active{border-bottom-color:var(--pri);background:#fff1ef;color:var(--pri)}
+.blank.filled{color:var(--ok);border-bottom-color:var(--ok);background:var(--okbg)}
+.fb{min-height:1.8em;text-align:center;font-weight:700;margin:10px 0 0;font-size:1.1rem}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.opts{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.opts{grid-template-columns:1fr 1fr}}
+.opts .chip{width:100%}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.pill{background:#f1ece0;border-radius:999px;padding:4px 12px;font-weight:700;font-size:.95rem}
+.timer{font-variant-numeric:tabular-nums}
+.timer.low{background:var(--badbg);color:var(--bad)}
+textarea{width:100%;min-height:96px;font:inherit;font-size:1.15rem;border:2px solid var(--line);border-radius:12px;padding:10px}
+.final{background:linear-gradient(180deg,#fff,#f3f7fb);text-align:center}
+.final .verse{font-weight:700}
+.big{font-size:3rem;margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stats div{background:#f6f3ec;border-radius:12px;padding:10px 4px;text-align:center}
+.stats b{display:block;font-size:1.4rem}
+.small{font-size:.9rem;color:var(--muted);text-align:center}
+.hide{display:none!important}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media(prefers-reduced-motion:reduce){.chip.bad{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>經文背誦小遊戲</h1>
+    <div class="ref" id="hdrRef"></div>
+  </header>
+  <main id="app"></main>
+  <p class="small">分數與進度只存在這台裝置的瀏覽器裡，不會上傳或收集任何個人資料。</p>
+</div>
+<script>
+(function(){
+"use strict";
+var VERSE = "耶和華說：你們來，我們彼此辯論。你們的罪雖像硃紅，必變成雪白；雖紅如丹顏，必白如羊毛。";
+var REF = "以賽亞書 1:18";
+var CHUNKS = ["耶和華說：","你們來，","我們彼此辯論。","你們的罪","雖像硃紅，","必變成雪白；","雖紅如丹顏，","必白如羊毛。"];
+var REF_DISTRACT = ["以賽亞書 1:17","以賽亞書 1:19","以賽亞書 53:5","以賽亞書 43:25","詩篇 51:7","耶利米書 31:34","彌迦書 7:19","以賽亞書 18:1"];
+if (CHUNKS.join("") !== VERSE) { throw new Error("詞塊與經文不一致"); }
+var PUNCT = /[，。：；、！？「」『』,.:;!?\s]/g;
+var KEY = "scriptureGame:isa-1-18:v1";
+var LEVELS = [
+  {n:1,t:"排序",d:"把打亂的詞塊排回正確順序"},
+  {n:2,t:"填空",d:"三輪挖空，空格越來越多"},
+  {n:3,t:"首字提示",d:"只看每個詞的第一個字"},
+  {n:4,t:"出處配對",d:"選出正確的書卷章節"},
+  {n:5,t:"計時挑戰",d:"混合題型，比速度與正確率"}
+];
+var app = document.getElementById("app");
+document.getElementById("hdrRef").textContent = REF;
+
+function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)||"{}"); return {unlocked:s.unlocked||1, done:s.done||{}, best:s.best||null}; }catch(e){ return {unlocked:1,done:{},best:null}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+var state = load();
+
+function el(tag, attrs, kids){
+  var e=document.createElement(tag);
+  if(attrs) for(var k in attrs){ if(k==="text") e.textContent=attrs[k]; else if(k==="class") e.className=attrs[k]; else if(k.slice(0,2)==="on") e.addEventListener(k.slice(2),attrs[k]); else e.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(function(c){ if(c!=null) e.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return e;
+}
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function shuffledNotIdentity(a){ var s; var tries=0; do{ s=shuffle(a); tries++; }while(tries<20 && s.join("|")===a.join("|")); return s; }
+function sample(a,n){ return shuffle(a).slice(0,n); }
+function clear(){ app.innerHTML=""; window.scrollTo(0,0); }
+function feedback(node, ok, msg){ node.className="fb "+(ok?"ok":"bad"); node.textContent=msg; }
+var PRAISE=["答對了！","太棒了！","很好！","正確！","繼續加油！"];
+function praise(){ return "✅ "+PRAISE[Math.floor(Math.random()*PRAISE.length)]; }
+function choicesFor(correctIdx, n){ var others=CHUNKS.map(function(_,i){return i;}).filter(function(i){return i!==correctIdx;}); return shuffle([correctIdx].concat(sample(others,n-1))); }
+function firstHint(c){ var core=c.replace(PUNCT,""); var p=c.slice(core.length); return core.charAt(0)+"＿".repeat(core.length-1)+p; }
+
+function header(title, sub){
+  return el("div",{class:"topbar"},[
+    el("button",{class:"btn ghost",text:"← 回選單",onclick:menu,"aria-label":"回到關卡選單"}),
+    el("span",{class:"pill",text:title}),
+  ]);
+}
+
+function menu(){
+  clear();
+  var c=el("section",{class:"card"},[
+    el("h2",{text:"今天要背的經文"}),
+    el("p",{class:"verse",text:VERSE}),
+    el("p",{class:"hint",text:"—— "+REF})
+  ]);
+  app.appendChild(c);
+  var list=el("div",{class:"levels"});
+  LEVELS.forEach(function(L){
+    var locked=L.n>state.unlocked, done=!!state.done[L.n];
+    var b=el("button",{class:"lv"+(locked?" locked":"")+(done?" done":""),"data-level":String(L.n),"aria-disabled":locked?"true":"false"},[
+      el("span",{class:"n",text:locked?"🔒":(done?"✓":String(L.n))}),
+      el("span",null,[el("strong",{text:"第"+L.n+"關　"+L.t}), el("small",{text:locked?"完成上一關後解鎖":L.d})])
+    ]);
+    b.addEventListener("click",function(){ if(!locked) startLevel(L.n); });
+    list.appendChild(b);
+  });
+  app.appendChild(el("section",{class:"card"},[el("h2",{text:"五個關卡"}),el("p",{class:"hint",text:"依序過關就能解鎖下一關。"}),list]));
+  var extra=el("div",{class:"row"});
+  if(state.done[5]) extra.appendChild(el("button",{class:"btn",text:"看完整經文",onclick:finalScreen}));
+  extra.appendChild(el("button",{class:"btn ghost",text:"重設進度",onclick:function(){ if(confirm("確定要清除這台裝置上的進度與最佳分數嗎？")){ state={unlocked:1,done:{},best:null}; save(); menu(); } }}));
+  app.appendChild(extra);
+}
+
+function startLevel(n){ [null,level1,level2,level3,level4,level5][n](); }
+
+function passLevel(n, msg){
+  state.done[n]=true; if(state.unlocked<n+1) state.unlocked=Math.min(5,n+1); save();
+  clear();
+  var kids=[el("p",{class:"big",text:"🎉"}),el("h2",{text:"第"+n+"關 過關！"}),el("p",{text:msg||"做得好！"}),el("p",{class:"verse",text:VERSE}),el("p",{class:"hint",text:"—— "+REF})];
+  var row=el("div",{class:"row"});
+  if(n<5) row.appendChild(el("button",{class:"btn",text:"前往第"+(n+1)+"關",onclick:function(){startLevel(n+1);}}));
+  row.appendChild(el("button",{class:"btn ghost",text:"再玩一次",onclick:function(){startLevel(n);}}));
+  row.appendChild(el("button",{class:"btn ghost",text:"回選單",onclick:menu}));
+  kids.push(row);
+  app.appendChild(el("section",{class:"card final",id:"passCard"},kids));
+}
+
+/* 第1關 排序 */
+function level1(){
+  clear();
+  var next=0, miss=0;
+  var zone=el("div",{class:"zone",id:"zone","aria-label":"答案區"});
+  var fb=el("p",{class:"fb","aria-live":"polite"});
+  var pool=el("div",{class:"chips",id:"pool"});
+  var order=shuffledNotIdentity(CHUNKS.map(function(_,i){return i;}));
+  function attempt(btn){
+    var i=+btn.getAttribute("data-i");
+    if(i===next){
+      btn.classList.add("used"); zone.appendChild(el("span",{class:"placed",text:CHUNKS[i]})); next++;
+      feedback(fb,true,praise());
+      if(next===CHUNKS.length) setTimeout(function(){ passLevel(1,"排序完成！錯了 "+miss+" 次。"); },500);
+    } else {
+      miss++; btn.classList.remove("bad"); void btn.offsetWidth; btn.classList.add("bad");
+      feedback(fb,false,"❌ 不是這個喔，下一段是「"+CHUNKS[next].charAt(0)+"…」開頭");
+      setTimeout(function(){btn.classList.remove("bad");},600);
+    }
+  }
+  order.forEach(function(i){
+    var b=el("button",{class:"chip","data-i":String(i),draggable:"true",text:CHUNKS[i]});
+    b.addEventListener("click",function(){ attempt(b); });
+    b.addEventListener("dragstart",function(e){ e.dataTransfer.setData("text/plain",String(i)); });
+    pool.appendChild(b);
+  });
+  zone.addEventListener("dragover",function(e){ e.preventDefault(); zone.classList.add("over"); });
+  zone.addEventListener("dragleave",function(){ zone.classList.remove("over"); });
+  zone.addEventListener("drop",function(e){ e.preventDefault(); zone.classList.remove("over"); var i=e.dataTransfer.getData("text/plain"); var b=pool.querySelector('[data-i="'+i+'"]'); if(b) attempt(b); });
+  app.appendChild(el("section",{class:"card"},[header("第1關　排序"),el("h2",{text:"把經文排回正確順序"}),el("p",{class:"hint",text:"依照經文順序點選詞塊（桌機也可以拖到上方答案區）。"}),zone,pool,fb]));
+}
+
+/* 第2關 填空 */
+function level2(){
+  var ROUNDS=[2,4,6]; var r=0, miss=0;
+  function round(){
+    clear();
+    var hidden=sample(CHUNKS.map(function(_,i){return i;}),ROUNDS[r]).sort(function(a,b){return a-b;});
+    var cur=0;
+    var verse=el("p",{class:"verse",id:"fillVerse"});
+    var spans={};
+    CHUNKS.forEach(function(c,i){
+      if(hidden.indexOf(i)>=0){ var core=c.replace(PUNCT,""); var s=el("span",{class:"blank","data-i":String(i),text:"＿".repeat(core.length)}); spans[i]=s; verse.appendChild(s); verse.appendChild(document.createTextNode(c.slice(core.length))); }
+      else verse.appendChild(document.createTextNode(c));
+    });
+    var opts=el("div",{class:"opts",id:"opts"}); var fb=el("p",{class:"fb","aria-live":"polite"});
+    function show(){
+      Object.keys(spans).forEach(function(k){ spans[k].classList.toggle("active", +k===hidden[cur]); });
+      opts.innerHTML="";
+      var target=hidden[cur];
+      choicesFor(target,4).forEach(function(i){
+        var core=CHUNKS[i].replace(PUNCT,"");
+        var b=el("button",{class:"chip","data-i":String(i),text:core});
+        b.addEventListener("click",function(){
+          if(i===target){ var s=spans[target]; s.textContent=core; s.className="blank filled"; feedback(fb,true,praise()); cur++;
+            if(cur===hidden.length){ opts.innerHTML=""; r++; setTimeout(function(){ if(r<ROUNDS.length) round(); else passLevel(2,"三輪填空全部完成！錯了 "+miss+" 次。"); },600); }
+            else show();
+          } else { miss++; b.classList.add("bad"); b.disabled=true; feedback(fb,false,"❌ 再想想，這一格是「"+CHUNKS[target].charAt(0)+"…」開頭"); }
+        });
+        opts.appendChild(b);
+      });
+    }
+    app.appendChild(el("section",{class:"card"},[header("第2關　填空 "+(r+1)+"/3"),el("h2",{text:"第"+(r+1)+"輪：挖空 "+ROUNDS[r]+" 格"}),el("p",{class:"hint",text:"紅色底線是現在要填的空格，從下方選出正確的詞。"}),verse,opts,fb]));
+    show();
+  }
+  round();
+}
+
+/* 第3關 首字提示 */
+function level3(){
+  clear();
+  var cur=0, miss=0;
+  var verse=el("p",{class:"verse",id:"hintVerse"});
+  var spans=CHUNKS.map(function(c,i){ var s=el("span",{"data-i":String(i),text:firstHint(c)}); verse.appendChild(s); return s; });
+  var opts=el("div",{class:"opts",id:"opts3"}); var fb=el("p",{class:"fb","aria-live":"polite"});
+  function mark(){ spans.forEach(function(s,i){ s.style.background = i===cur?"#fff1ef":""; s.style.color = i<cur?"var(--ok)":""; }); }
+  function done(){ opts.innerHTML=""; spans.forEach(function(s,i){ s.textContent=CHUNKS[i]; s.style.background=""; s.style.color="var(--ok)"; }); setTimeout(function(){ passLevel(3,"只靠首字就背出來了！錯了 "+miss+" 次。"); },700); }
+  function show(){
+    mark(); opts.innerHTML="";
+    choicesFor(cur,4).forEach(function(i){
+      var b=el("button",{class:"chip","data-i":String(i),text:CHUNKS[i].replace(PUNCT,"")});
+      b.addEventListener("click",function(){
+        if(i===cur){ spans[cur].textContent=CHUNKS[cur]; feedback(fb,true,praise()); cur++; if(cur===CHUNKS.length) done(); else show(); }
+        else { miss++; b.classList.add("bad"); b.disabled=true; feedback(fb,false,"❌ 不對喔，提示是「"+firstHint(CHUNKS[cur])+"」"); }
+      });
+      opts.appendChild(b);
+    });
+  }
+  var ta=el("textarea",{id:"typeBox",placeholder:"也可以直接打出整節經文（標點和空格不計）",autocomplete:"off",autocapitalize:"off",spellcheck:"false"});
+  var fb2=el("p",{class:"fb","aria-live":"polite"});
+  var chk=el("button",{class:"btn",id:"typeCheck",text:"檢查我打的經文",onclick:function(){
+    var a=ta.value.replace(PUNCT,""), want=VERSE.replace(PUNCT,"");
+    if(a===want){ feedback(fb2,true,"✅ 一字不差！"); done(); }
+    else { miss++; var k=0; while(k<a.length && a[k]===want[k]) k++; feedback(fb2,false,"❌ 前 "+k+" 個字正確，從「"+(want.slice(k,k+2)||"結尾")+"」附近再檢查一次"); }
+  }});
+  app.appendChild(el("section",{class:"card"},[header("第3關　首字提示"),el("h2",{text:"看首字，選出每一段"}),el("p",{class:"hint",text:"每段只剩第一個字，依序選出正確的詞。"}),verse,opts,fb,
+    el("details",null,[el("summary",{text:"改用打字作答"}),ta,el("div",{class:"row",style:"margin-top:10px"},[chk]),fb2])]));
+  show();
+}
+
+/* 第4關 出處配對 */
+function level4(){
+  clear();
+  var opts=el("div",{class:"opts",id:"opts4"}); var fb=el("p",{class:"fb","aria-live":"polite"}); var miss=0;
+  shuffle([REF].concat(sample(REF_DISTRACT,3))).forEach(function(r){
+    var b=el("button",{class:"chip","data-ref":r,text:r});
+    b.addEventListener("click",function(){
+      if(r===REF){ b.classList.add("ok"); feedback(fb,true,"✅ 沒錯，是"+REF+"！"); opts.querySelectorAll("button").forEach(function(x){x.disabled=true;}); setTimeout(function(){ passLevel(4,"出處記住了！錯了 "+miss+" 次。"); },700); }
+      else { miss++; b.classList.add("bad"); b.disabled=true; feedback(fb,false,"❌ 不是"+r+"，再選一次"); }
+    });
+    opts.appendChild(b);
+  });
+  app.appendChild(el("section",{class:"card"},[header("第4關　出處配對"),el("h2",{text:"這節經文出自哪裡？"}),el("p",{class:"verse",text:VERSE}),opts,fb]));
+}
+
+/* 第5關 計時挑戰 */
+function level5(){
+  var TOTAL=10, LIMIT=90;
+  var qs=[], i;
+  // 題型：下一段、填空、首字、出處
+  var types=shuffle(["next","next","next","fill","fill","fill","hint","hint","ref","ref"]);
+  types.forEach(function(t){
+    if(t==="next"){ var k=Math.floor(Math.random()*(CHUNKS.length-1)); qs.push({type:"接下一句",prompt:"「"+CHUNKS[k]+"」的下一段是？",ans:CHUNKS[k+1].replace(PUNCT,""),opts:choicesFor(k+1,4).map(function(j){return CHUNKS[j].replace(PUNCT,"");})}); }
+    else if(t==="fill"){ var k2=Math.floor(Math.random()*CHUNKS.length); var core=CHUNKS[k2].replace(PUNCT,""); var p=CHUNKS.map(function(c,j){ return j===k2? "（　　）"+c.slice(core.length) : c; }).join(""); qs.push({type:"填空",prompt:p,ans:core,opts:choicesFor(k2,4).map(function(j){return CHUNKS[j].replace(PUNCT,"");})}); }
+    else if(t==="hint"){ var k3=Math.floor(Math.random()*CHUNKS.length); qs.push({type:"首字提示",prompt:"第 "+(k3+1)+" 段的提示是「"+firstHint(CHUNKS[k3])+"」，是哪一段？",ans:CHUNKS[k3].replace(PUNCT,""),opts:choicesFor(k3,4).map(function(j){return CHUNKS[j].replace(PUNCT,"");})}); }
+    else { qs.push({type:"出處",prompt:"「"+VERSE+"」出自？",ans:REF,opts:shuffle([REF].concat(sample(REF_DISTRACT,3)))}); }
+  });
+  clear();
+  var idx=0, correct=0, answered=0, t0=Date.now(), timerId=null, over=false;
+  var timer=el("span",{class:"pill timer",id:"timer",text:LIMIT+" 秒"});
+  var prog=el("span",{class:"pill",id:"prog"});
+  var typ=el("p",{class:"hint"}); var prompt=el("p",{class:"verse",id:"q5"}); var opts=el("div",{class:"opts",id:"opts5"}); var fb=el("p",{class:"fb","aria-live":"polite"});
+  var bar=el("div",{class:"topbar"},[el("button",{class:"btn ghost",text:"← 回選單",onclick:function(){ clearInterval(timerId); menu(); }}),prog,timer]);
+  app.appendChild(el("section",{class:"card"},[bar,el("h2",{text:"第5關　計時挑戰"}),typ,prompt,opts,fb]));
+  function left(){ return Math.max(0, LIMIT-Math.floor((Date.now()-t0)/1000)); }
+  timerId=setInterval(function(){ var l=left(); timer.textContent=l+" 秒"; timer.classList.toggle("low",l<=15); if(l<=0) finish(true); },250);
+  function show(){
+    var q=qs[idx]; prog.textContent="第 "+(idx+1)+" / "+TOTAL+" 題　答對 "+correct; typ.textContent="題型："+q.type; prompt.textContent=q.prompt; opts.innerHTML="";
+    q.opts.forEach(function(o){
+      var b=el("button",{class:"chip",text:o,"data-ans":o===q.ans?"1":"0"});
+      b.addEventListener("click",function(){
+        if(over) return; answered++;
+        opts.querySelectorAll("button").forEach(function(x){ x.disabled=true; if(x.getAttribute("data-ans")==="1") x.classList.add("ok"); });
+        if(o===q.ans){ correct++; feedback(fb,true,praise()); } else { b.classList.add("bad"); feedback(fb,false,"❌ 正確答案是「"+q.ans+"」"); }
+        setTimeout(function(){ idx++; if(idx>=TOTAL) finish(false); else { if(!over){ fb.textContent=""; show(); } } }, o===q.ans?450:1100);
+      });
+      opts.appendChild(b);
+    });
+  }
+  function finish(timeout){
+    if(over) return; over=true; clearInterval(timerId);
+    var used=Math.min(LIMIT, Math.round((Date.now()-t0)/1000));
+    var acc= answered? Math.round(correct/TOTAL*100) : 0;
+    var score= correct*100 + (timeout?0:Math.max(0,LIMIT-used)*5);
+    var newBest=false;
+    if(!state.best || score>state.best.score){ state.best={score:score,acc:acc,time:used}; newBest=true; }
+    var passed = acc>=70;
+    if(passed){ state.done[5]=true; }
+    save();
+    clear();
+    var kids=[el("p",{class:"big",text:passed?"🏆":"⏱️"}),el("h2",{text:timeout?"時間到！":(passed?"挑戰完成！":"差一點點！")}),
+      el("div",{class:"stats"},[el("div",null,[el("b",{id:"score",text:String(score)}),"分數"]),el("div",null,[el("b",{id:"acc",text:acc+"%"}),"正確率"]),el("div",null,[el("b",{text:used+" 秒"}),"用時"])]),
+      el("p",{text:"答對 "+correct+" / "+TOTAL+" 題"+(newBest?"　🎖️ 新紀錄！":"")+"　最佳分數："+state.best.score}),
+      el("p",{class:"hint",text:passed?"正確率 70% 以上就算過關。":"正確率要 70% 以上才算過關，再挑戰一次吧！"})];
+    var row=el("div",{class:"row"});
+    if(passed) row.appendChild(el("button",{class:"btn",id:"toFinal",text:"看完整經文",onclick:finalScreen}));
+    row.appendChild(el("button",{class:"btn ghost",id:"replay5",text:"再挑戰一次",onclick:level5}));
+    row.appendChild(el("button",{class:"btn ghost",text:"回選單",onclick:menu}));
+    kids.push(row);
+    app.appendChild(el("section",{class:"card final",id:"result5"},kids));
+  }
+  show();
+}
+
+function finalScreen(){
+  clear();
+  app.appendChild(el("section",{class:"card final",id:"finalCard"},[
+    el("p",{class:"big",text:"🕊️"}),el("h2",{text:"恭喜！五關全部完成"}),
+    el("p",{class:"verse",id:"finalVerse",text:VERSE}),
+    el("p",{id:"finalRef",style:"font-weight:700;font-size:1.15rem",text:"—— "+REF}),
+    state.best? el("p",{class:"hint",text:"計時挑戰最佳分數："+state.best.score+" 分（正確率 "+state.best.acc+"%）"}) : null,
+    el("div",{class:"row"},[el("button",{class:"btn",text:"回選單",onclick:menu}),el("button",{class:"btn ghost",text:"再挑戰計時關",onclick:level5})])
+  ]));
+}
+
+menu();
+})();
+</script>
+</body>
+</html>
