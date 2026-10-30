@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>經文背誦遊戲</title>
+<style>
+:root {
+  --bg: #f6f3ec;
+  --card: #fff;
+  --ink: #1f2a37;
+  --muted: #5b6675;
+  --pri: #8c1d17;
+  --line: #e3ddd0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 16px 48px;
+}
+h1 {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 1.75rem;
+  color: var(--pri);
+}
+.lead {
+  margin: 0 0 24px;
+  text-align: center;
+  color: var(--muted);
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+li a {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.25rem;
+  touch-action: manipulation;
+}
+li a:active {
+  background: #fff8f6;
+  border-color: var(--pri);
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>經文背誦遊戲</h1>
+  <p class="lead">選擇一段經文開始練習</p>
+  <ul>
+    <li><a href="isaiah-1-18.html">以賽亞書 1:18</a></li>
+  </ul>
+</main>
+</body>
+</html>
